@@ -11,6 +11,10 @@ impl SysInfoData {
 
         Self { sys_info: sys }
     }
+
+    pub fn update_cpu_performmance(&mut self) {
+        self.sys_info.refresh_cpu(); // Refreshing CPU information.
+    }
 }
 
 fn print_info() {
@@ -59,17 +63,10 @@ fn print_info() {
     }
 
     // // Number of CPUs:
-    // println!("NB CPUs: {}", sys.cpus().len());
+    // println!("NB CPUs: {}", self.sys_info.cpus().len());
 
     // // Display processes ID, name na disk usage:
-    // for (pid, process) in sys.processes() {
+    // for (pid, process) in self.sys_info.processes() {
     //     println!("[{}] {} {:?}", pid, process.name(), process.disk_usage());
-    // }
-
-    // loop {
-    //     sys.refresh_cpu(); // Refreshing CPU information.
-    //     for (i, cpu) in sys.cpus().iter().enumerate() {
-    //         println!("CPU {i}: {}% ", cpu.cpu_usage());
-    //     }
     // }
 }
