@@ -13,7 +13,7 @@ impl SysInfoData {
     }
 
     pub fn update_cpu_performmance(&mut self) {
-        self.sys_info.refresh_cpu(); // Refreshing CPU information.
+        self.sys_info.refresh_all(); // Refreshing CPU information.
     }
 }
 
