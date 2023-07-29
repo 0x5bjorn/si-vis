@@ -49,24 +49,24 @@ fn print_info() {
         println!("{:?}", component);
     }
 
-    loop {
-        sys.refresh_all();
+    // loop {
+    //     sys.refresh_all();
 
-        println!("=> system:");
-        // RAM and swap information:
-        println!("total memory: {} bytes", sys.total_memory());
-        println!("used memory : {} bytes", sys.used_memory());
-        println!("total swap  : {} bytes", sys.total_swap());
-        println!("used swap   : {} bytes", sys.used_swap());
+    //     println!("=> system:");
+    //     // RAM and swap information:
+    //     println!("total memory: {} bytes", sys.total_memory());
+    //     println!("used memory : {} bytes", sys.used_memory());
+    //     println!("total swap  : {} bytes", sys.total_swap());
+    //     println!("used swap   : {} bytes", sys.used_swap());
 
-        // Display system information:
-    }
+    //     // Display system information:
+    // }
 
     // // Number of CPUs:
     // println!("NB CPUs: {}", self.sys_info.cpus().len());
 
     // // Display processes ID, name na disk usage:
-    // for (pid, process) in self.sys_info.processes() {
+    // for (pid, process) in sys.processes() {
     //     println!("[{}] {} {:?}", pid, process.name(), process.disk_usage());
     // }
 }

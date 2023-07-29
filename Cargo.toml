@@ -7,7 +7,9 @@ edition = "2021"
 
 [dependencies]
 byte-unit = "4.0.19"
+chrono = "0.4.26"
 eframe = "0.22.0"
 egui = "0.22.0"
 egui_dock = "0.6.3"
+egui_extras = "0.22.0"
 sysinfo = "0.29.4"

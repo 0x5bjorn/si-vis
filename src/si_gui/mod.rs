@@ -1,19 +1,20 @@
 mod si_data;
 
 use byte_unit::Byte;
+use chrono::{NaiveDate, NaiveDateTime};
 use eframe::egui;
-use std::{
-    sync::{Arc, Mutex},
-    thread,
-};
-
 use egui::{
     plot::{Line, Plot, PlotPoints},
     ProgressBar, Ui,
 };
 use egui_dock::{DockArea, Style, TabViewer, Tree};
+use egui_extras::{Column, TableBuilder};
 use si_data::SysInfoData;
-use sysinfo::{CpuExt, SystemExt};
+use std::{
+    sync::{Arc, Mutex},
+    thread,
+};
+use sysinfo::{CpuExt, NetworksExt, Pid, ProcessExt, SystemExt};
 
 pub struct SysInfoGuiApp {
     tree: Tree<String>,
@@ -22,7 +23,11 @@ pub struct SysInfoGuiApp {
 
 impl SysInfoGuiApp {
     pub fn new() -> Self {
-        let mut tree = Tree::new(vec!["System Info".to_owned(), "CPU performance".to_owned()]);
+        let mut tree = Tree::new(vec![
+            "System Info".to_owned(),
+            "CPU performance".to_owned(),
+            "Processes".to_owned(),
+        ]);
         let tab_viewer = SysInfoGuiTabViewer {
             sys_info_data: Arc::new(Mutex::new(SysInfoData::new())),
         };
@@ -40,11 +45,14 @@ impl SysInfoGuiApp {
 impl eframe::App for SysInfoGuiApp {
     fn update(&mut self, ctx: &egui::Context, frame: &mut eframe::Frame) {
         egui::CentralPanel::default().show(ctx, |ui| {
+            let mut style = Style::from_egui(ctx.style().as_ref());
+            style.tabs.fill_tab_bar = true;
+
             DockArea::new(&mut self.tree)
-                .style(Style::from_egui(ctx.style().as_ref()))
+                .style(style)
                 .show_close_buttons(false)
                 .show_add_buttons(false)
-                .draggable_tabs(false)
+                .draggable_tabs(true)
                 .show(ctx, &mut self.tab_viewer);
         });
         ctx.request_repaint();
@@ -75,6 +83,10 @@ impl SysInfoGuiTabViewer {
         ui.label(format!(
             "System host name: {}",
             mg_sys_info.sys_info.host_name().unwrap()
+        ));
+        ui.label(format!(
+            "Boot time: {}",
+            NaiveDateTime::from_timestamp_opt(mg_sys_info.sys_info.boot_time() as i64, 0).unwrap()
         ));
 
         ui.separator();
@@ -115,6 +127,12 @@ impl SysInfoGuiTabViewer {
                 to_gb(mg_sys_info.sys_info.used_swap() as u128)
             ));
         });
+
+        ui.separator();
+        ui.heading("Network Data");
+        for (i, net) in mg_sys_info.sys_info.networks().iter() {
+            ui.label(format!("{i}: {:?}", net));
+        }
     }
 
     fn display_cpu_performance(&mut self, ui: &mut Ui) {
@@ -136,6 +154,80 @@ impl SysInfoGuiTabViewer {
             });
         }
     }
+
+    fn display_process_info(&mut self, ui: &mut Ui) {
+        let mg_sys_info = self.sys_info_data.lock().unwrap();
+
+        let process_table = TableBuilder::new(ui)
+            .striped(true)
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::auto().resizable(true))
+            .column(Column::remainder())
+            .header(20.0, |mut header| {
+                header.col(|ui| {
+                    ui.button("PID");
+                });
+                header.col(|ui| {
+                    ui.button("Name");
+                });
+                header.col(|ui| {
+                    ui.button("CPU usage");
+                });
+                header.col(|ui| {
+                    ui.button("Memory");
+                });
+                header.col(|ui| {
+                    ui.button("Virtual memory");
+                });
+                header.col(|ui| {
+                    ui.button("Parent PID");
+                });
+                header.col(|ui| {
+                    ui.button("Runtime");
+                });
+                header.col(|ui| {
+                    ui.button("Disk usage");
+                });
+            })
+            .body(|mut body| {
+                for (pid, process) in mg_sys_info.sys_info.processes() {
+                    body.row(30.0, |mut row| {
+                        row.col(|ui| {
+                            ui.label(pid.to_string());
+                        });
+                        row.col(|ui| {
+                            ui.label(process.name());
+                        });
+                        row.col(|ui| {
+                            ui.label(process.cpu_usage().to_string());
+                        });
+                        row.col(|ui| {
+                            ui.label(to_gb(process.memory() as u128));
+                        });
+                        row.col(|ui| {
+                            ui.label(to_gb(process.virtual_memory() as u128));
+                        });
+                        row.col(|ui| {
+                            ui.label(match process.parent() {
+                                Some(pid) => pid.to_string(),
+                                None => "None".to_owned(),
+                            });
+                        });
+                        row.col(|ui| {
+                            ui.label(process.run_time().to_string());
+                        });
+                        row.col(|ui| {
+                            ui.label(format!("{:?}", process.disk_usage()));
+                        });
+                    });
+                }
+            });
+    }
 }
 
 impl TabViewer for SysInfoGuiTabViewer {
@@ -145,6 +237,7 @@ impl TabViewer for SysInfoGuiTabViewer {
         match tab.as_str() {
             "System Info" => self.display_basic_info(ui),
             "CPU performance" => self.display_cpu_performance(ui),
+            "Processes" => self.display_process_info(ui),
             _ => {
                 ui.label(tab.as_str());
             }
