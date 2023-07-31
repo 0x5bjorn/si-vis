@@ -1,4 +1,6 @@
 # System Info visualizer (si-vis)
+*in development*
+
 Simple system info visualizer written in Rust for educational purposes only
 ## Dependency resolution
 - [eframe](https://github.com/emilk/egui/tree/master/crates/eframe) - official framework library for writing apps using [egui](https://github.com/emilk/egui), GUI library for Rust
