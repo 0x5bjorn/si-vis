@@ -20,4 +20,4 @@ Processes info table tab
 ## Future plans
 - Reorganize app layout
 - Add sorting based on columns in processes info table
-- Display memory allocation process in real-time when specific process is selected (inspired by [mevi](https://github.com/fasterthanlime/mevi))
+- Display memory allocations in real-time when specific process is selected (inspired by [mevi](https://github.com/fasterthanlime/mevi))
