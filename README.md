@@ -20,6 +20,7 @@ CPU and its usage info tab
 Processes info table tab
 ![exec flow](readme-images/processes-info-tab.jpg)
 ## Future plans
+- Change UI from `egui` to [ratatui](https://github.com/ratatui-org/ratatui)
 - Reorganize app layout
 - Add sorting based on columns in processes info table
 - Display memory allocations in real-time when specific process is selected (inspired by [mevi](https://github.com/fasterthanlime/mevi))
