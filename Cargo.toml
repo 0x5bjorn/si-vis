@@ -8,8 +8,7 @@ edition = "2021"
 [dependencies]
 byte-unit = "4.0.19"
 chrono = "0.4.26"
-eframe = "0.22.0"
-egui = "0.22.0"
-egui_dock = "0.6.3"
-egui_extras = "0.22.0"
+crossterm = "0.27.0"
+rand = "0.8.5"
+ratatui = { version = "0.23.0", features = ["all-widgets"] }
 sysinfo = "0.29.4"
