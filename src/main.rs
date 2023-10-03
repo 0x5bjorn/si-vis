@@ -1,13 +1,14 @@
 mod app;
 mod tui;
-
-use std::{io, time::Duration};
+mod ui;
+mod sys_data;
 
 use app::{App, AppResult};
-use crossterm::event::{self, Event, KeyCode};
 use tui::Tui;
 
+use crossterm::event::{self, Event, KeyCode};
 use ratatui::{prelude::CrosstermBackend, Terminal};
+use std::{io, time::Duration};
 
 fn main() -> AppResult<()> {
     let mut app = App::new();
@@ -18,7 +19,7 @@ fn main() -> AppResult<()> {
     tui.init()?;
 
     while app.running {
-        tui.draw()?;
+        tui.draw(&mut app)?;
 
         if event::poll(Duration::from_millis(250))? {
             if let Event::Key(key) = event::read()? {
