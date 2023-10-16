@@ -1,12 +1,46 @@
-use crate::app::{App, AppResult};
+use crate::app;
 
 use ratatui::{prelude::*, widgets::*, Frame};
+use std::rc::Rc;
 
-pub fn render_table<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
-    let rects = Layout::default()
-        .constraints([Constraint::Percentage(100)].as_ref())
-        .split(frame.size());
+pub fn setup_layout<B: Backend>(frame: &mut Frame<'_, B>) -> Rc<[Rect]> {
+    Layout::default()
+        .direction(Direction::Vertical)
+        .constraints([Constraint::Length(3), Constraint::Min(0)])
+        .split(frame.size())
+}
 
+pub fn render_tabs<B: Backend>(
+    app: &mut app::App,
+    frame: &mut Frame<'_, B>,
+    layout_chunks: Rc<[Rect]>,
+) {
+    let block = Block::default().on_white().black();
+    frame.render_widget(block, frame.size());
+
+    let titles = app.tab_titles.clone();
+    let tabs = Tabs::new(titles)
+        .block(Block::default().borders(Borders::ALL).title("Tabs"))
+        .select(app.tab_index)
+        .style(Style::default().cyan().on_gray())
+        .highlight_style(Style::default().bold().on_black());
+    frame.render_widget(tabs, layout_chunks[0]);
+
+    match app.tab_index {
+        0 => frame.render_widget(
+            Block::default().title("Inner 1").borders(Borders::ALL),
+            layout_chunks[1],
+        ),
+        1 => render_table(app, frame, layout_chunks),
+        _ => unreachable!(),
+    };
+}
+
+pub fn render_table<B: Backend>(
+    app: &mut app::App,
+    frame: &mut Frame<'_, B>,
+    layout_chunks: Rc<[Rect]>,
+) {
     let selected_style = Style::default().add_modifier(Modifier::REVERSED);
     let normal_style = Style::default().bg(Color::Blue);
     let header_cells = ["Header1", "Header2", "Header3"]
@@ -59,5 +93,5 @@ pub fn render_table<B: Backend>(app: &mut App, frame: &mut Frame<'_, B>) {
             Constraint::Max(30),
             Constraint::Min(10),
         ]);
-    frame.render_widget(t, rects[0]);
+    frame.render_widget(t, layout_chunks[1]);
 }

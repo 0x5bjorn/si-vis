@@ -1,4 +1,4 @@
-use crate::app::{App, AppResult};
+use crate::app;
 use crate::ui;
 
 use crossterm::{
@@ -17,7 +17,7 @@ impl<B: Backend> Tui<B> {
         Self { term: terminal }
     }
 
-    pub fn init(&mut self) -> AppResult<()> {
+    pub fn init(&mut self) -> app::AppResult<()> {
         enable_raw_mode()?;
         execute!(io::stdout(), EnterAlternateScreen)?;
 
@@ -31,19 +31,22 @@ impl<B: Backend> Tui<B> {
         Ok(())
     }
 
-    pub fn draw(&mut self, app: &mut App) -> AppResult<()> {
-        self.term.draw(|frame| ui::render_table(app, frame))?;
+    pub fn draw(&mut self, app: &mut app::App) -> app::AppResult<()> {
+        self.term.draw(|frame| {
+            let layout_chunks = ui::setup_layout(frame);
+            ui::render_tabs(app, frame, layout_chunks);
+        })?;
 
         Ok(())
     }
 
-    pub fn exit(&mut self) -> AppResult<()> {
+    pub fn exit(&mut self) -> app::AppResult<()> {
         Self::reset()?;
         self.term.show_cursor()?;
         Ok(())
     }
 
-    fn reset() -> AppResult<()> {
+    fn reset() -> app::AppResult<()> {
         disable_raw_mode()?;
         execute!(io::stdout(), LeaveAlternateScreen)?;
         Ok(())
