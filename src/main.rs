@@ -1,7 +1,7 @@
 mod app;
 mod si_data;
+mod si_ui;
 mod tui;
-mod ui;
 
 use crossterm::event::{self, Event, KeyCode, KeyEventKind};
 use ratatui::{prelude::CrosstermBackend, Terminal};
@@ -23,8 +23,10 @@ fn main() -> app::AppResult<()> {
                 if key.kind == KeyEventKind::Press {
                     match key.code {
                         KeyCode::Char('q') => break,
-                        KeyCode::Char('a') => app.next_tab_index(),
-                        KeyCode::Char('d') => app.previous_tab_index(),
+                        KeyCode::Char('a') | KeyCode::Left => app.next_tab_index(),
+                        KeyCode::Char('d') | KeyCode::Right => app.prev_tab_index(),
+                        KeyCode::Char('s') | KeyCode::Down => app.next_row(),
+                        KeyCode::Char('w') | KeyCode::Up => app.prev_row(),
                         _ => {}
                     }
                 }

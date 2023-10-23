@@ -1,3 +1,4 @@
+use byte_unit::Byte;
 use sysinfo::{CpuExt, NetworkExt, ProcessExt, System, SystemExt};
 
 pub struct SysInfoData {
@@ -12,7 +13,13 @@ impl SysInfoData {
         Self { sys_info: sys }
     }
 
-    pub fn update_cpu_performmance(&mut self) {
+    pub fn update_si_data(&mut self) {
         self.sys_info.refresh_all(); // Refreshing CPU information.
     }
+}
+
+pub fn to_gb(data_in_bytes: u128) -> String {
+    Byte::from_bytes(data_in_bytes)
+        .get_appropriate_unit(true)
+        .format(1)
 }

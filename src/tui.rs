@@ -1,5 +1,5 @@
 use crate::app;
-use crate::ui;
+use crate::si_ui;
 
 use crossterm::{
     execute,
@@ -33,8 +33,8 @@ impl<B: Backend> Tui<B> {
 
     pub fn draw(&mut self, app: &mut app::App) -> app::AppResult<()> {
         self.term.draw(|frame| {
-            let layout_chunks = ui::setup_layout(frame);
-            ui::render_tabs(app, frame, layout_chunks);
+            let layout_chunks = si_ui::setup_layout(frame);
+            si_ui::render_tabs(app, frame, layout_chunks);
         })?;
 
         Ok(())
